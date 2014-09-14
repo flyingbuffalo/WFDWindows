@@ -43,10 +43,12 @@ namespace Buffalo.WiFiDirect
                         l.onDevicesDiscovered(wfdList);
                     });
                 }
+
+                //add peerfinder
+
             });
 
-            //m_workItem = asyncAction;
-
+            
             asyncAction.Completed = new AsyncActionCompletedHandler(
                 (IAsyncAction asyncInfo, AsyncStatus asyncStatus) =>
             {
@@ -57,10 +59,12 @@ namespace Buffalo.WiFiDirect
                 });
 
             });
+
+            //onDevicesDiscoverFailed() 추가해야함
         }
 
-        private WFDDeviceConnectedListener connectedListener = null;
-        public void connectAsync(WFDDevice device, WFDDeviceConnectedListener l)
+        //private WFDDeviceConnectedListener connectedListener = null;
+        public void pairAsync(WFDDevice device, WFDDeviceConnectedListener l)
         {
             IAsyncAction asyncAction = ThreadPool.RunAsync(async (workItem) =>
             {
@@ -68,48 +72,41 @@ namespace Buffalo.WiFiDirect
                 {
                     DeviceInformation devInfo = (DeviceInformation)device.WFDDeviceInfo;
                     WiFiDirectDevice wfdDevice = await WiFiDirectDevice.FromIdAsync(devInfo.Id);
-                    
-                    wfdDevice.ConnectionStatusChanged += new TypedEventHandler<WiFiDirectDevice, object>(onDisconnection);
+
+                    wfdDevice.ConnectionStatusChanged += new TypedEventHandler<WiFiDirectDevice, object>((WiFiDirectDevice sender, object arg)
+                        => {
+                            Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
+                                (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                            {
+                                l.onDeviceDisconnected();
+                            });
+                        });
 
                     var endpointPairCollection = wfdDevice.GetConnectionEndpointPairs();
                     EndpointPair endpointPair = endpointPairCollection[0];
 
-                    StreamSocketListener socketListener = new StreamSocketListener();
-                    socketListener.ConnectionReceived += onConnection;
+
+                    l.onDeviceConnected(new WFDPairInfo(device, endpointPair));
+                    //onDeviceConnectFailed(int reasonCode)추가해야함
+                }
+
+                else
+                {
+                    //add peerfinder
                 }
             });
         }
 
-        public void disconnect(WFDDevice device) {
-            if (device.IsDevice)
+        public void unpair(WFDPairInfo pair)
+        {
+            if (pair.getWFDDevice().IsDevice)
             {
-
+                (pair.getWFDDevice().WFDDeviceInfo as WiFiDirectDevice).Dispose();
             }
             else
             {
-
+                //add peerfinder
             }
-        }
-         
-        private async void onConnection(StreamSocketListener sender,
-            StreamSocketListenerConnectionReceivedEventArgs args)
-        {
-            StreamSocket s = args.Socket;
-            Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
-                (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                connectedListener.onDeviceConnected(s);
-            });
-        }
-
-        private async void onDisconnection(object sender, object arg)
-        {
-            Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
-                (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                connectedListener.onDeviceDisconnected();
-            });
-            connectedListener = null;
         }
     }
 }

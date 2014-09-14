@@ -8,6 +8,8 @@ namespace Buffalo.WiFiDirect
 {
     public interface WFDDeviceDiscoveredListener
     {
-        public void onDevicesDiscovered(List<WFDDevice> deviceList);
+        void onDevicesDiscovered(List<WFDDevice> deviceList);
+        void onDevicesDiscoverFailed(int reasonCode);
+
     }
 }

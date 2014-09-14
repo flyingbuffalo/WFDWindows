@@ -9,7 +9,8 @@ namespace Buffalo.WiFiDirect
 {
     public interface WFDDeviceConnectedListener
     {
-        public void onDeviceConnected(StreamSocket s);
-        public void onDeviceDisconnected();
+        void onDeviceConnected(WFDPairInfo pair);
+        void onDeviceConnectFailed(int reasonCode);
+        void onDeviceDisconnected();
     }
 }

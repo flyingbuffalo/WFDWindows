@@ -10,7 +10,7 @@ namespace Buffalo.WiFiDirect
 {
     public class WFDDevice
     {
-        bool bDevice = false;
+        private bool bDevice = false;
         private DeviceInformation wfdDevInfo = null;
 
         public WFDDevice(DeviceInformation wfdDevInfo)
@@ -19,7 +19,7 @@ namespace Buffalo.WiFiDirect
             bDevice = true;
         }
 
-        public Object WFDDeviceInfo
+        internal Object WFDDeviceInfo
         {
             get
             {
@@ -27,7 +27,7 @@ namespace Buffalo.WiFiDirect
             }
         }
 
-        public bool IsDevice
+        internal bool IsDevice
         {
             get
             {
