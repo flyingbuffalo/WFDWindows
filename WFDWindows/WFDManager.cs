@@ -17,7 +17,6 @@ namespace Buffalo.WiFiDirect
 {
     public class WFDManager
     {
-        private IAsyncAction m_workItem;
         //private delegate void WorkItemHandler(IAsyncAction operation);
 
         public void getDevicesAsync(WFDDeviceDiscoveredListener l)
@@ -26,7 +25,6 @@ namespace Buffalo.WiFiDirect
 
             IAsyncAction asyncAction = ThreadPool.RunAsync( async (workItem) =>
             {
-
                 string wfdSelector = WiFiDirectDevice.GetDeviceSelector(); ;
                 DeviceInformationCollection devInfoCollection = await DeviceInformation.FindAllAsync(wfdSelector);
 
@@ -80,6 +78,17 @@ namespace Buffalo.WiFiDirect
                     socketListener.ConnectionReceived += onConnection;
                 }
             });
+        }
+
+        public void disconnect(WFDDevice device) {
+            if (device.IsDevice)
+            {
+
+            }
+            else
+            {
+
+            }
         }
          
         private async void onConnection(StreamSocketListener sender,
