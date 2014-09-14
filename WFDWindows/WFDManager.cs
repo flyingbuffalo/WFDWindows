@@ -46,18 +46,15 @@ namespace Buffalo.WiFiDirect
 
                 //add peerfinder
 
-            });
 
-            
-            asyncAction.Completed = new AsyncActionCompletedHandler(
-                (IAsyncAction asyncInfo, AsyncStatus asyncStatus) =>
-            {
-                CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
+
+                //call callback
+                l.onDevicesDiscovered(wfdList);
+                /*CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
                     (CoreDispatcherPriority.Normal, () =>
-                {
-                    l.onDevicesDiscovered(wfdList);
-                });
-
+                    {
+                        l.onDevicesDiscovered(wfdList);
+                    });*/
             });
 
             //onDevicesDiscoverFailed() 추가해야함

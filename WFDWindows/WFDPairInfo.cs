@@ -51,11 +51,12 @@ namespace Buffalo.WiFiDirect
                 {
                     //windows-device connection, conncted callback
                     StreamSocket s = args.Socket;
-                    Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
+                    l.onSocketConnected(s);
+                    /*Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
                     (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
                         l.onSocketConnected(s);
-                    });
+                    });*/
                 };
         }
         

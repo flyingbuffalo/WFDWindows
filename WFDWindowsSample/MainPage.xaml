@@ -7,7 +7,29 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+
+    <Grid>
+        
+        <ComboBox x:Name="comboDeviceList" DisplayMemberPath="{Binding Name}"
+                  HorizontalAlignment="Left" Margin="250,180,0,0"
+                  VerticalAlignment="Top" Width="415"/>
+        
+        <Button x:Name="btnFindDevices" Click="btnFindDevices_Click"
+                Content="Find Devices" HorizontalAlignment="Left"
+                Margin="247,52,0,0" VerticalAlignment="Top"
+                Height="66" Width="521"/>
+        
+        <Button x:Name="btnConnect" Click="btnConnect_Click"
+                Content="Connect" HorizontalAlignment="Left"
+                Margin="688,177,0,0" VerticalAlignment="Top"/>
+        
+        <TextBlock x:Name="tbReceivedText"
+                   HorizontalAlignment="Left" Margin="250,275,0,0"
+                   TextWrapping="Wrap" Text="Received Text:"
+                   VerticalAlignment="Top" Height="200" Width="524" />
 
     </Grid>
+
+
 </Page>

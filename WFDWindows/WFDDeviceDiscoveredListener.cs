@@ -10,6 +10,5 @@ namespace Buffalo.WiFiDirect
     {
         void onDevicesDiscovered(List<WFDDevice> deviceList);
         void onDevicesDiscoverFailed(int reasonCode);
-
     }
 }

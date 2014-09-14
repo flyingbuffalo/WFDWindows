@@ -34,5 +34,14 @@ namespace Buffalo.WiFiDirect
                 return bDevice;
             }
         }
+
+        public string Name {
+            get { return wfdDevInfo.Name; }
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
