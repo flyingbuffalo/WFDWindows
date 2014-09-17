@@ -23,7 +23,12 @@
         <Button x:Name="btnConnect" Click="btnConnect_Click"
                 Content="Connect" HorizontalAlignment="Left"
                 Margin="688,177,0,0" VerticalAlignment="Top"/>
-        
+
+        <TextBlock x:Name="tbMessage"
+                   HorizontalAlignment="Left" Margin="250,20,0,0"
+                   TextWrapping="Wrap" Text="Init"
+                   VerticalAlignment="Top" Height="20" Width="524" />
+
         <TextBlock x:Name="tbReceivedText"
                    HorizontalAlignment="Left" Margin="250,275,0,0"
                    TextWrapping="Wrap" Text="Received Text:"

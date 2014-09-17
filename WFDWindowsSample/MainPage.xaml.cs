@@ -16,7 +16,6 @@ using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using System.Threading;
 using Windows.UI.Core;
-using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.System.Threading;
@@ -32,7 +31,7 @@ namespace WFDWindowsSample
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        WFDManager manager = new WFDManager();
+        private WFDManager manager;
         WFDDevice device;
         WFDPairInfo pairInfo;
         
@@ -41,12 +40,14 @@ namespace WFDWindowsSample
         public MainPage()
         {
             this.InitializeComponent();
+            manager = new WFDManager(this);
             discoveredListener = new DiscoveredListener(this);
         }
 
         private void btnFindDevices_Click(object sender, RoutedEventArgs e)
         {
             manager.getDevicesAsync(discoveredListener);
+            tbMessage.Text = "Finding Devices...";
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -57,31 +58,31 @@ namespace WFDWindowsSample
 
 
         public class DiscoveredListener : WFDDeviceDiscoveredListener, WFDDeviceConnectedListener, WFDPairInfo.PairSocketConnectedListener
-
         {
             MainPage parent;
             public DiscoveredListener(MainPage parent)
             {
                 this.parent = parent;
             }
-
+            
             public async void onDevicesDiscovered(List<WFDDevice> deviceList)
             {
-                await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                ObservableCollection<WFDDevice> devList = new ObservableCollection<WFDDevice>(deviceList);
+                parent.comboDeviceList.ItemsSource = devList;
+
+                if (deviceList.Count != 0)
+                {
+                    foreach (WFDDevice dev in deviceList)
                     {
-
-                        ObservableCollection<WFDDevice> devList = new ObservableCollection<WFDDevice>(deviceList);
-                        parent.comboDeviceList.ItemsSource = devList;
-
-                        if (deviceList.Count != 0)
-                        {
-                            foreach (WFDDevice dev in deviceList)
-                            {
-                                Debug.WriteLine(dev.Name);
-                            }
-                            parent.comboDeviceList.SelectedIndex = 0;
-                        }
-                    });
+                        Debug.WriteLine(dev.Name);
+                    }
+                    parent.comboDeviceList.SelectedIndex = 0;
+                    parent.tbMessage.Text = "Found " + deviceList.Count;
+                }
+                else
+                {
+                    parent.tbMessage.Text = "Found Not";
+                }
             }
 
             public void onDevicesDiscoverFailed(int reasonCode)

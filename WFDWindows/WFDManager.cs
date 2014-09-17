@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using Windows.UI.Core;
+using Windows.UI.Xaml;
 using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
@@ -17,6 +18,12 @@ namespace Buffalo.WiFiDirect
 {
     public class WFDManager
     {
+        private readonly DependencyObject parent;
+        public WFDManager(DependencyObject parent)
+        {
+            this.parent = parent;
+        }
+
         //private delegate void WorkItemHandler(IAsyncAction operation);
 
         public void getDevicesAsync(WFDDeviceDiscoveredListener l)
@@ -36,20 +43,17 @@ namespace Buffalo.WiFiDirect
                 if (workItem.Status == AsyncStatus.Canceled)
                 {
                     wfdList.Clear();
-
-                    Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
-                        (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    {
-                        l.onDevicesDiscovered(wfdList);
-                    });
                 }
 
                 //add peerfinder
 
+                await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        //call callback
+                        l.onDevicesDiscovered(wfdList);
+                    });
 
-
-                //call callback
-                l.onDevicesDiscovered(wfdList);
+                
                 /*CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
                     (CoreDispatcherPriority.Normal, () =>
                     {
@@ -70,10 +74,9 @@ namespace Buffalo.WiFiDirect
                     DeviceInformation devInfo = (DeviceInformation)device.WFDDeviceInfo;
                     WiFiDirectDevice wfdDevice = await WiFiDirectDevice.FromIdAsync(devInfo.Id);
 
-                    wfdDevice.ConnectionStatusChanged += new TypedEventHandler<WiFiDirectDevice, object>((WiFiDirectDevice sender, object arg)
+                    wfdDevice.ConnectionStatusChanged += new TypedEventHandler<WiFiDirectDevice, object>(async (WiFiDirectDevice sender, object arg)
                         => {
-                            Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
-                                (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                            await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                             {
                                 l.onDeviceDisconnected();
                             });
@@ -83,8 +86,12 @@ namespace Buffalo.WiFiDirect
                     EndpointPair endpointPair = endpointPairCollection[0];
 
 
-                    l.onDeviceConnected(new WFDPairInfo(device, endpointPair));
-                    //onDeviceConnectFailed(int reasonCode)추가해야함
+                    await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        //call callback
+                        l.onDeviceConnected(new WFDPairInfo(device, endpointPair, parent));
+                        //onDeviceConnectFailed(int reasonCode)추가해야함
+                    });
                 }
 
                 else

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 
@@ -10,14 +11,17 @@ namespace Buffalo.WiFiDirect
 {
     public class WFDPairInfo
     {
+        //private 
+        private DependencyObject parentUI;
         private WFDDevice device;
         private EndpointPair deviceEndpointPair = null;
         private StreamSocket socket;
 
-        internal WFDPairInfo(WFDDevice device, EndpointPair deviceEndpointPair)
+        internal WFDPairInfo(WFDDevice device, EndpointPair deviceEndpointPair, DependencyObject parent)
         {
             this.device = device;
             this.deviceEndpointPair = deviceEndpointPair;
+            this.parentUI = parent;
         }
 
         public HostName getLocalAddress()
@@ -46,12 +50,17 @@ namespace Buffalo.WiFiDirect
         public void connectSocketAsync(PairSocketConnectedListener l)
         {
             StreamSocketListener socketListener = new StreamSocketListener();
-            socketListener.ConnectionReceived += (StreamSocketListener sender,
+            socketListener.ConnectionReceived += async (StreamSocketListener sender,
                     StreamSocketListenerConnectionReceivedEventArgs args) =>
                 {
                     //windows-device connection, conncted callback
                     StreamSocket s = args.Socket;
-                    l.onSocketConnected(s);
+                    
+                    await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        l.onSocketConnected(s);
+                    });
+                    
                     /*Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
                     (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
