@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
+using Windows.Storage.Streams;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -113,9 +114,15 @@ namespace WFDWindowsSample
 
             public void onSocketConnected(StreamSocket s)
             {
+                DataWriter writer = new DataWriter(s.OutputStream);
+                writer.WriteString("ping~ping~");
+               
+                writer.Dispose();
+                s.Dispose();
 
+                parent.manager.unpair(parent.pairInfo);
             }
-        }
+        }   
     }
 }
 
