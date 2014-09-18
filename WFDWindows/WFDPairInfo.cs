@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.Networking;
 using Windows.Networking.Sockets;
+using Windows.Networking.Proximity;
 
 namespace Buffalo.WiFiDirect
 {
@@ -18,6 +19,14 @@ namespace Buffalo.WiFiDirect
         private EndpointPair deviceEndpointPair = null;
         private StreamSocket socket;
 
+        internal WFDPairInfo(WFDDevice device, DependencyObject parent)
+        {
+            /*to windows, can't get local or remote Address 'cause it doesn't have EndpointPair*/
+            this.device = device;
+            this.parentUI = parent;
+            
+
+        }
         internal WFDPairInfo(WFDDevice device, EndpointPair deviceEndpointPair, DependencyObject parent)
         {
             this.device = device;
@@ -52,21 +61,30 @@ namespace Buffalo.WiFiDirect
         {
             Debug.WriteLine("connectSocketAsync");
 
+            
             StreamSocketListener socketListener = new StreamSocketListener();
             socketListener.ConnectionReceived += async (StreamSocketListener sender,
                     StreamSocketListenerConnectionReceivedEventArgs args) =>
                 {
                     Debug.WriteLine("ConnectionReceived");
                     //windows-device connection, conncted callback
-                    StreamSocket s = args.Socket;
-                    
+                    StreamSocket s;
+                    if (this.device.IsDevice)
+                    {
+                        s = args.Socket;
+                    }
+                    else
+                    {
+                        s = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
+                    }
+
                     await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
                         Debug.WriteLine("Call onSocketConnected");
-                        
+
                         l.onSocketConnected(s);
                     });
-                    
+
                     /*Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
                     (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {

@@ -6,17 +6,26 @@ using System.Threading.Tasks;
 using Windows.Devices.WiFiDirect;
 using Windows.Devices.Enumeration;
 
+using Windows.Networking.Proximity;
+
 namespace Buffalo.WiFiDirect
 {
     public class WFDDevice
     {
         private bool bDevice = false;
         private DeviceInformation wfdDevInfo = null;
+        private PeerInformation peerInfo = null;
 
         public WFDDevice(DeviceInformation wfdDevInfo)
         {
             this.wfdDevInfo = wfdDevInfo;
             bDevice = true;
+        }
+        
+        public WFDDevice(PeerInformation peerInfo)
+        {
+            this.peerInfo = peerInfo;
+            bDevice = false;
         }
 
         internal Object WFDDeviceInfo

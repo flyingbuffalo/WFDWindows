@@ -13,6 +13,7 @@ using Windows.System.Threading;
 using Windows.Devices.WiFiDirect;
 using Windows.Devices.Enumeration;
 
+using Windows.Networking.Proximity;
 
 namespace Buffalo.WiFiDirect
 {
@@ -30,14 +31,30 @@ namespace Buffalo.WiFiDirect
         {
             List<WFDDevice> wfdList = new List<WFDDevice>();
 
+            bool checkPeerFinder = (PeerFinder.SupportedDiscoveryTypes & PeerDiscoveryTypes.Browse) == PeerDiscoveryTypes.Browse;
+            bool allowWifiDirect = PeerFinder.AllowWiFiDirect;
+
             IAsyncAction asyncAction = ThreadPool.RunAsync( async (workItem) =>
             {
+                /*to Android*/
                 string wfdSelector = WiFiDirectDevice.GetDeviceSelector(); ;
                 DeviceInformationCollection devInfoCollection = await DeviceInformation.FindAllAsync(wfdSelector);
 
+                /*to Windows*/
+                IEnumerable<PeerInformation> pList = null;
+                pList = await PeerFinder.FindAllPeersAsync();
+
+                if (pList == null) throw new Exception("No peer");
+
+
                 foreach (DeviceInformation devInfo in devInfoCollection)
-                {
+                { /* to Android */
                     wfdList.Add(new WFDDevice(devInfo));
+                }
+
+                foreach (PeerInformation peerInfo in pList)
+                { /* to Windows */
+                    wfdList.Add(new WFDDevice(peerInfo));
                 }
 
                 if (workItem.Status == AsyncStatus.Canceled)
@@ -89,10 +106,12 @@ namespace Buffalo.WiFiDirect
                     l.onDeviceConnected(new WFDPairInfo(device, endpointPair, parent));
                     //onDeviceConnectFailed(int reasonCode)추가해야함
                 }
-
                 else
                 {
-                    //add peerfinder
+                    //PeerInformation peerInfo = (PeerInformation)device.WFDDeviceInfo;
+                    //StreamSocket socket = await PeerFinder.ConnectAsync(peerInfo);
+
+                    l.onDeviceConnected(new WFDPairInfo(device, parent));
                 }
             });
         }
@@ -105,6 +124,7 @@ namespace Buffalo.WiFiDirect
             }
             else
             {
+                //PeerFinder.Stop();
                 //add peerfinder
             }
         }
