@@ -32,7 +32,8 @@ namespace Buffalo.WiFiDirect
         {
             get
             {
-                return wfdDevInfo;
+                return bDevice? (Object)wfdDevInfo :
+                                (Object)peerInfo;
             }
         }
 
@@ -45,7 +46,8 @@ namespace Buffalo.WiFiDirect
         }
 
         public string Name {
-            get { return wfdDevInfo.Name; }
+            get { return bDevice? wfdDevInfo.Name :
+                                  peerInfo.DisplayName; }
         }
 
         public override string ToString()
