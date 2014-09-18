@@ -113,7 +113,6 @@ namespace Buffalo.WiFiDirect
             }
             
         }
-        }
         
         public interface PairSocketConnectedListener
         {
