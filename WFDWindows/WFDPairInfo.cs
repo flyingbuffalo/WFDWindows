@@ -61,41 +61,58 @@ namespace Buffalo.WiFiDirect
         {
             Debug.WriteLine("connectSocketAsync");
 
-            
-            StreamSocketListener socketListener = new StreamSocketListener();
-            socketListener.ConnectionReceived += async (StreamSocketListener sender,
-                    StreamSocketListenerConnectionReceivedEventArgs args) =>
-                {
-                    Debug.WriteLine("ConnectionReceived");
-                    //windows-device connection, conncted callback
-                    StreamSocket s;
-                    if (this.device.IsDevice)
+            if(device.IsDevice) {
+            /*to Android*/
+                StreamSocketListener socketListener = new StreamSocketListener();
+                socketListener.ConnectionReceived += async (StreamSocketListener sender,
+                        StreamSocketListenerConnectionReceivedEventArgs args) =>
                     {
-                        s = args.Socket;
-                    }
-                    else
-                    {
-                        s = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
-                    }
+                        Debug.WriteLine("ConnectionReceived");
+                        //windows-device connection, conncted callback
+                        StreamSocket s = args.Socket;
+                    
+                        await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            Debug.WriteLine("Call onSocketConnected");
 
-                    await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    {
-                        Debug.WriteLine("Call onSocketConnected");
+                            l.onSocketConnected(s);
+                        });
 
-                        l.onSocketConnected(s);
-                    });
+                        /*Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
+                        (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            l.onSocketConnected(s);
+                        });*/
 
-                    /*Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher.RunAsync
-                    (Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    {
-                        l.onSocketConnected(s);
-                    });*/
-                };
-
-            parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                    };
+                parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
                     await socketListener.BindServiceNameAsync("9190");
                 });
+
+            } else { /*to Windows*/
+                StreamSocket socket = null;
+
+                PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) => {
+                    Debug.WriteLine("ConnectionReceived");
+
+                    StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
+                    await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            Debug.WriteLine("Call onSocketConnected");
+
+                            l.onSocketConnected(s);
+                        });
+                };
+
+                parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() =>
+                {
+                    socket = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
+                });
+
+            }
+            
+        }
         }
         
         public interface PairSocketConnectedListener
