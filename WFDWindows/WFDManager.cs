@@ -67,7 +67,7 @@ namespace Buffalo.WiFiDirect
         //private WFDDeviceConnectedListener connectedListener = null;
         public void pairAsync(WFDDevice device, WFDDeviceConnectedListener l)
         {
-            IAsyncAction asyncAction = ThreadPool.RunAsync(async (workItem) =>
+            parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
                 if (device.IsDevice)
                 {
@@ -86,12 +86,8 @@ namespace Buffalo.WiFiDirect
                     EndpointPair endpointPair = endpointPairCollection[0];
 
 
-                    await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    {
-                        //call callback
-                        l.onDeviceConnected(new WFDPairInfo(device, endpointPair, parent));
-                        //onDeviceConnectFailed(int reasonCode)추가해야함
-                    });
+                    l.onDeviceConnected(new WFDPairInfo(device, endpointPair, parent));
+                    //onDeviceConnectFailed(int reasonCode)추가해야함
                 }
 
                 else
