@@ -23,6 +23,7 @@ namespace Buffalo.WiFiDirect
         public WFDManager(DependencyObject parent)
         {
             this.parent = parent;
+            PeerFinder.Start();
         }
 
         //private delegate void WorkItemHandler(IAsyncAction operation);
@@ -37,14 +38,14 @@ namespace Buffalo.WiFiDirect
             IAsyncAction asyncAction = ThreadPool.RunAsync( async (workItem) =>
             {
                 /*to Android*/
-                string wfdSelector = WiFiDirectDevice.GetDeviceSelector(); ;
+                string wfdSelector = WiFiDirectDevice.GetDeviceSelector();
                 DeviceInformationCollection devInfoCollection = await DeviceInformation.FindAllAsync(wfdSelector);
 
                 /*to Windows*/
                 IEnumerable<PeerInformation> pList = null;
                 pList = await PeerFinder.FindAllPeersAsync();
 
-                if (pList == null) throw new Exception("No peer");
+                //if (pList == null) throw new Exception("No peer");
 
 
                 foreach (DeviceInformation devInfo in devInfoCollection)
@@ -52,9 +53,11 @@ namespace Buffalo.WiFiDirect
                     wfdList.Add(new WFDDevice(devInfo));
                 }
 
-                foreach (PeerInformation peerInfo in pList)
-                { /* to Windows */
-                    wfdList.Add(new WFDDevice(peerInfo));
+                if (pList != null) {
+                    foreach (PeerInformation peerInfo in pList)
+                    { /* to Windows */
+                        wfdList.Add(new WFDDevice(peerInfo));
+                    }
                 }
 
                 if (workItem.Status == AsyncStatus.Canceled)
