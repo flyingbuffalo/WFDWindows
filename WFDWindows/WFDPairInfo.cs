@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.Networking;
 using Windows.Networking.Sockets;
@@ -49,15 +50,20 @@ namespace Buffalo.WiFiDirect
 
         public void connectSocketAsync(PairSocketConnectedListener l)
         {
+            Debug.WriteLine("connectSocketAsync");
+
             StreamSocketListener socketListener = new StreamSocketListener();
             socketListener.ConnectionReceived += async (StreamSocketListener sender,
                     StreamSocketListenerConnectionReceivedEventArgs args) =>
                 {
+                    Debug.WriteLine("ConnectionReceived");
                     //windows-device connection, conncted callback
                     StreamSocket s = args.Socket;
                     
                     await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
+                        Debug.WriteLine("Call onSocketConnected");
+                        
                         l.onSocketConnected(s);
                     });
                     
@@ -67,6 +73,11 @@ namespace Buffalo.WiFiDirect
                         l.onSocketConnected(s);
                     });*/
                 };
+
+            parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    await socketListener.BindServiceNameAsync("9190");
+                });
         }
         
         public interface PairSocketConnectedListener

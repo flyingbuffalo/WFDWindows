@@ -54,6 +54,7 @@ namespace WFDWindowsSample
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             device = comboDeviceList.SelectedItem as WFDDevice;
+            tbMessage.Text = "Connect to " + device.Name;
             manager.pairAsync(device, discoveredListener);
         }
 
@@ -96,10 +97,11 @@ namespace WFDWindowsSample
             public void onDeviceConnected(WFDPairInfo pair)
             {
                 parent.pairInfo = pair;
+
                 Debug.WriteLine("paring");
-
+                parent.tbMessage.Text = "Device's IP Address : " + pair.getRemoteAddress().DisplayName; 
+              
                 pair.connectSocketAsync(this);
-
             }
 
             public void onDeviceConnectFailed(int reasonCode)
@@ -114,13 +116,19 @@ namespace WFDWindowsSample
 
             public void onSocketConnected(StreamSocket s)
             {
-                DataWriter writer = new DataWriter(s.OutputStream);
-                writer.WriteString("ping~ping~");
-               
-                writer.Dispose();
-                s.Dispose();
+                parent.tbMessage.Text = "Socket Connected.";
 
-                parent.manager.unpair(parent.pairInfo);
+                DataWriter writer = new DataWriter(s.OutputStream);
+                writer.WriteString("ping~ping~\n");
+
+                writer.StoreAsync();
+                writer.FlushAsync();
+
+                parent.tbMessage.Text = "Send Message.";
+             //   writer.Dispose();
+            //    s.Dispose();
+
+               // parent.manager.unpair(parent.pairInfo);
             }
         }   
     }
