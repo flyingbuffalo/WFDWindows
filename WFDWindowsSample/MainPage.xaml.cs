@@ -99,7 +99,7 @@ namespace WFDWindowsSample
                 parent.pairInfo = pair;
 
                 Debug.WriteLine("paring");
-                parent.tbMessage.Text = "Device's IP Address : " + pair.getRemoteAddress().DisplayName; 
+                parent.tbMessage.Text = "Device's IP Address : " + pair.getRemoteAddress(); 
               
                 pair.connectSocketAsync(this);
             }
