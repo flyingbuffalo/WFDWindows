@@ -44,6 +44,7 @@ namespace Buffalo.WiFiDirect
         public void getDevicesAsync(WFDDeviceDiscoveredListener l)
         {
             List<WFDDevice> wfdList = new List<WFDDevice>();
+            IEnumerable<PeerInformation> pList = null;
 
             bool checkPeerFinder = (PeerFinder.SupportedDiscoveryTypes & PeerDiscoveryTypes.Browse) == PeerDiscoveryTypes.Browse;
             bool allowWifiDirect = PeerFinder.AllowWiFiDirect;
@@ -55,8 +56,17 @@ namespace Buffalo.WiFiDirect
                 DeviceInformationCollection devInfoCollection = await DeviceInformation.FindAllAsync(wfdSelector);
 
                 /*to Windows*/
-                IEnumerable<PeerInformation> pList = null;
-                pList = await PeerFinder.FindAllPeersAsync();
+                if (checkPeerFinder && allowWifiDirect)
+                {
+                    pList = await PeerFinder.FindAllPeersAsync();
+                    if (pList != null)
+                    {
+                        foreach (PeerInformation peerInfo in pList)
+                        { /* to Windows */
+                            wfdList.Add(new WFDDevice(peerInfo));
+                        }
+                    }
+                }
 
                 //if (pList == null) throw new Exception("No peer");
 
@@ -66,12 +76,7 @@ namespace Buffalo.WiFiDirect
                     wfdList.Add(new WFDDevice(devInfo));
                 }
 
-                if (pList != null) {
-                    foreach (PeerInformation peerInfo in pList)
-                    { /* to Windows */
-                        wfdList.Add(new WFDDevice(peerInfo));
-                    }
-                }
+                
 
                 if (workItem.Status == AsyncStatus.Canceled)
                 {
