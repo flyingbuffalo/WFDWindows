@@ -12,6 +12,7 @@ using Windows.Networking.Sockets;
 using Windows.System.Threading;
 using Windows.Devices.WiFiDirect;
 using Windows.Devices.Enumeration;
+using System.Diagnostics;
 
 using Windows.Networking.Proximity;
 
@@ -24,6 +25,18 @@ namespace Buffalo.WiFiDirect
         {
             this.parent = parent;
             PeerFinder.Start();
+
+            PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) =>
+            {
+                Debug.WriteLine("ConnectionReceived");
+
+                StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
+                
+                /*await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    Debug.WriteLine("Call onSocketConnected");
+                });*/
+            };
         }
 
         //private delegate void WorkItemHandler(IAsyncAction operation);

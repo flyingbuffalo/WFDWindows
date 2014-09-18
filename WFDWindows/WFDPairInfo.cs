@@ -34,14 +34,16 @@ namespace Buffalo.WiFiDirect
             this.parentUI = parent;
         }
 
-        public HostName getLocalAddress()
+        public string getLocalAddress()
         {
-            return deviceEndpointPair.LocalHostName;
+            return device.IsDevice? deviceEndpointPair.LocalHostName.DisplayName :
+                                    "";
         }
 
-        public HostName getRemoteAddress()
+        public string getRemoteAddress()
         {
-            return deviceEndpointPair.RemoteHostName;
+            return device.IsDevice? deviceEndpointPair.RemoteHostName.DisplayName :
+                                    "";
         }
 
         internal WFDDevice getWFDDevice()
@@ -90,10 +92,11 @@ namespace Buffalo.WiFiDirect
                     await socketListener.BindServiceNameAsync("9190");
                 });
 
+
             } else { /*to Windows*/
                 StreamSocket socket = null;
 
-                PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) => {
+                /*PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) => {
                     Debug.WriteLine("ConnectionReceived");
 
                     StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
@@ -103,7 +106,7 @@ namespace Buffalo.WiFiDirect
 
                             l.onSocketConnected(s);
                         });
-                };
+                };*/
 
                 parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() =>
                 {
@@ -112,7 +115,6 @@ namespace Buffalo.WiFiDirect
 
             }
             
-        }
         }
         
         public interface PairSocketConnectedListener
