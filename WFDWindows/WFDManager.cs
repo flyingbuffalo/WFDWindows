@@ -59,25 +59,21 @@ namespace Buffalo.WiFiDirect
                 if (checkPeerFinder && allowWifiDirect)
                 {
                     pList = await PeerFinder.FindAllPeersAsync();
-                    if (pList != null)
-                    {
-                        foreach (PeerInformation peerInfo in pList)
-                        { /* to Windows */
-                            wfdList.Add(new WFDDevice(peerInfo));
-                        }
-                    }
                 }
-
-                //if (pList == null) throw new Exception("No peer");
-
 
                 foreach (DeviceInformation devInfo in devInfoCollection)
                 { /* to Android */
                     wfdList.Add(new WFDDevice(devInfo));
                 }
 
+                if (pList != null)
+                {
+                    foreach (PeerInformation peerInfo in pList)
+                    { /* to Windows */
+                        wfdList.Add(new WFDDevice(peerInfo));
+                    }
+                }
                 
-
                 if (workItem.Status == AsyncStatus.Canceled)
                 {
                     wfdList.Clear();
