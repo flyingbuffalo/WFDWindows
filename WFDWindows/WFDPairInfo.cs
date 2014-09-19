@@ -35,7 +35,7 @@ namespace Buffalo.WiFiDirect
         }
 
         public string getLocalAddress()
-        {
+        { 
             return device.IsDevice? deviceEndpointPair.LocalHostName.DisplayName :
                                     "";
         }
@@ -58,7 +58,7 @@ namespace Buffalo.WiFiDirect
             socketListener.ConnectionReceived += onConnection;
         }*/
 
-
+        /* 비동기적으로 StreamSocket을 연결*/
         public void connectSocketAsync(PairSocketConnectedListener l)
         {
             Debug.WriteLine("connectSocketAsync");
@@ -107,7 +107,7 @@ namespace Buffalo.WiFiDirect
                             l.onSocketConnected(s);
                         });
                 };*/
-
+                /* ConnectAsync를 parentUI의 쓰레드에서 실행한다. */
                 parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() =>
                 {
                     socket = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);

@@ -12,8 +12,11 @@ namespace Buffalo.WiFiDirect
 {
     public class WFDDevice
     {
+        /* true  : to Android
+         * false : to Windows */
         private bool bDevice = false;
         private DeviceInformation wfdDevInfo = null;
+        /* to Windows, PeerFiner를 이용한 연결을 지원하기 위한 정보*/
         private PeerInformation peerInfo = null;
 
         public WFDDevice(DeviceInformation wfdDevInfo)
