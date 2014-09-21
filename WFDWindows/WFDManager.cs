@@ -20,10 +20,29 @@ namespace Buffalo.WiFiDirect
 {
     public class WFDManager
     {
+        private WFDDeviceDiscoveredListener wfdDeviceDiscoveredListener;
+        private WFDDeviceConnectedListener wfdDeviceConnectedListener;
+
         private readonly DependencyObject parent;
-        public WFDManager(DependencyObject parent)
+
+        public void setWFDDeviceDiscoveredListener(WFDDeviceDiscoveredListener wfdDeviceDiscoveredListener)
+        {
+            this.wfdDeviceDiscoveredListener = wfdDeviceDiscoveredListener;
+        }
+
+        public void setWFDDeviceConnectedListener(WFDDeviceConnectedListener wfdDeviceConnectedListener)
+        {
+            this.wfdDeviceConnectedListener = wfdDeviceConnectedListener;
+        }
+
+        
+        public WFDManager(DependencyObject parent,
+                          WFDDeviceDiscoveredListener wfdDeviceDiscoveredListener,
+                          WFDDeviceConnectedListener wfdDeviceConnectedListener)
         {
             this.parent = parent;
+            setWFDDeviceConnectedListener(wfdDeviceConnectedListener);
+            setWFDDeviceDiscoveredListener(wfdDeviceDiscoveredListener);
 
             //PeerFinder.Start();가 getDevicesAsync로 가야하는건가..
             /*peer Application을 찾는 프로세스를 시작하고 Application을 원격 피어에서 검색할 수 있게 만듦*/
@@ -45,7 +64,7 @@ namespace Buffalo.WiFiDirect
 
         //private delegate void WorkItemHandler(IAsyncAction operation);
 
-        public void getDevicesAsync(WFDDeviceDiscoveredListener l)
+        public void getDevicesAsync()
         {
             List<WFDDevice> wfdList = new List<WFDDevice>();
             IEnumerable<PeerInformation> pList = null;
@@ -98,7 +117,7 @@ namespace Buffalo.WiFiDirect
                     {
                         //call callback
                         //WFDDeviceDiscoverdListner.onDevicesDiscovered를 통해 wfdList를 리턴한다
-                        l.onDevicesDiscovered(wfdList);
+                        wfdDeviceDiscoveredListener.onDevicesDiscovered(wfdList);
                     });
 
                 
@@ -116,7 +135,7 @@ namespace Buffalo.WiFiDirect
         /*
          * @param device : 연결하고자 하는 WFDDevice
          */
-        public void pairAsync(WFDDevice device, WFDDeviceConnectedListener l)
+        public void pairAsync(WFDDevice device)
         {
             parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
@@ -129,7 +148,7 @@ namespace Buffalo.WiFiDirect
                         => {
                             await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                             {
-                                l.onDeviceDisconnected();
+                                wfdDeviceConnectedListener.onDeviceDisconnected();
                             });
                         });
 
@@ -137,7 +156,7 @@ namespace Buffalo.WiFiDirect
                     EndpointPair endpointPair = endpointPairCollection[0];
 
 
-                    l.onDeviceConnected(new WFDPairInfo(device, endpointPair, parent));
+                    wfdDeviceConnectedListener.onDeviceConnected(new WFDPairInfo(device, endpointPair, parent));
                     //onDeviceConnectFailed(int reasonCode)추가해야함
                 }
                 else
@@ -147,7 +166,7 @@ namespace Buffalo.WiFiDirect
                     //PeerInformation peerInfo = (PeerInformation)device.WFDDeviceInfo;
                     //StreamSocket socket = await PeerFinder.ConnectAsync(peerInfo);
 
-                    l.onDeviceConnected(new WFDPairInfo(device, parent));
+                    wfdDeviceConnectedListener.onDeviceConnected(new WFDPairInfo(device, parent));
                 }
             });
         }
