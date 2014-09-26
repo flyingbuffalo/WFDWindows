@@ -142,7 +142,22 @@ namespace Buffalo.WiFiDirect
                 if (device.IsDevice)
                 { /*to Android*/
                     DeviceInformation devInfo = (DeviceInformation)device.WFDDeviceInfo;
-                    WiFiDirectDevice wfdDevice = await WiFiDirectDevice.FromIdAsync(devInfo.Id);
+
+
+                    WiFiDirectDevice wfdDevice = null;
+                    try
+                    {
+                        wfdDevice = await WiFiDirectDevice.FromIdAsync(devInfo.Id);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e.Message + "\n" + e.StackTrace);
+                        parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            wfdDeviceConnectedListener.onDeviceConnectFailed(10);   // <- make reason code!!!
+                        });
+                        return;
+                    }
 
                     wfdDevice.ConnectionStatusChanged += new TypedEventHandler<WiFiDirectDevice, object>(async (WiFiDirectDevice sender, object arg)
                         => {
