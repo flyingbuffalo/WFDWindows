@@ -40,7 +40,7 @@ namespace Buffalo.WiFiDirect
             }
         }
 
-        internal bool IsDevice
+        public bool IsDevice
         {
             get
             {
