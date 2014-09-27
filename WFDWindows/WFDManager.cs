@@ -60,9 +60,7 @@ namespace Buffalo.WiFiDirect
                 //StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
                 if (ConnectionRequested != null)
                 {
-                    Debug.WriteLine("aa01");
                     ConnectionRequested(this, args);
-                    Debug.WriteLine("aa02");
                 }
 
                 WFDPairInfo pInfo = new WFDPairInfo(new WFDDevice(args.PeerInformation), parent);

@@ -58,6 +58,22 @@ namespace Buffalo.WiFiDirect
             socketListener.ConnectionReceived += onConnection;
         }*/
 
+
+        public void receivedSocketAsync(PairSocketConnectedListener l)
+        {
+            if(device.IsDevice){
+
+            } else{
+                StreamSocket socket = null;
+               
+                parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+                {
+                    socket = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
+                    l.onSocketReceived(socket);
+                });
+            }
+            
+        }
         /* 비동기적으로 StreamSocket을 연결*/
         public void connectSocketAsync(PairSocketConnectedListener l)
         {
@@ -95,22 +111,11 @@ namespace Buffalo.WiFiDirect
 
             } else { /*to Windows*/
                 StreamSocket socket = null;
-
-                /*PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) => {
-                    Debug.WriteLine("ConnectionReceived");
-
-                    StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
-                    await parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                        {
-                            Debug.WriteLine("Call onSocketConnected");
-
-                            l.onSocketConnected(s);
-                        });
-                };*/
                 /* ConnectAsync를 parentUI의 쓰레드에서 실행한다. */
                 parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() =>
                 {
                     socket = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
+                    l.onSocketConnected(socket);
                 });
 
             }
@@ -120,6 +125,7 @@ namespace Buffalo.WiFiDirect
         public interface PairSocketConnectedListener
         {
 		    void onSocketConnected(StreamSocket s);
+            void onSocketReceived(StreamSocket s);
         }
 
     }
