@@ -22,6 +22,7 @@ namespace Buffalo.WiFiDirect
     {
         private WFDDeviceDiscoveredListener wfdDeviceDiscoveredListener;
         private WFDDeviceConnectedListener wfdDeviceConnectedListener;
+        private WFDPairInfo.PairSocketConnectedListener wfdPairSocketConnectedListener;
 
         private readonly DependencyObject parent;
 
@@ -59,8 +60,15 @@ namespace Buffalo.WiFiDirect
                 //StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
                 if (ConnectionRequested != null)
                 {
+                    Debug.WriteLine("aa01");
                     ConnectionRequested(this, args);
+                    Debug.WriteLine("aa02");
                 }
+
+                WFDPairInfo pInfo = new WFDPairInfo(new WFDDevice(args.PeerInformation), parent);
+                pInfo.connectSocketAsync(wfdPairSocketConnectedListener);
+                
+
                 /*await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     Debug.WriteLine("Call onSocketConnected");
