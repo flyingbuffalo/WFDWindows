@@ -35,7 +35,8 @@ namespace Buffalo.WiFiDirect
             this.wfdDeviceConnectedListener = wfdDeviceConnectedListener;
         }
 
-        
+
+        private event EventHandler<ConnectionRequestedEventArgs> ConnectionRequested;
         public WFDManager(DependencyObject parent,
                           WFDDeviceDiscoveredListener wfdDeviceDiscoveredListener,
                           WFDDeviceConnectedListener wfdDeviceConnectedListener)
@@ -49,12 +50,17 @@ namespace Buffalo.WiFiDirect
             PeerFinder.Start();
 
             /* 상대 peer에서 connection요청이 왔을 경우 처리할 함수*/
+            /// public event EventHandler<ConnectionRequestedEventArgs> ConnectionRequested;
+           
             PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) =>
             {
                 Debug.WriteLine("ConnectionReceived");
 
-                StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
-                
+                //StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
+                if (ConnectionRequested != null)
+                {
+                    ConnectionRequested(this, args);
+                }
                 /*await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     Debug.WriteLine("Call onSocketConnected");
