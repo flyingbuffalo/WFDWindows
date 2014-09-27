@@ -89,7 +89,7 @@ namespace Buffalo.WiFiDirect
                     };
                 parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
-                    await socketListener.BindServiceNameAsync("9190");
+                    await socketListener.BindServiceNameAsync("8988");
                 });
 
 
