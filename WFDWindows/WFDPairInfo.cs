@@ -69,6 +69,10 @@ namespace Buffalo.WiFiDirect
                 parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                 {
                     socket = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
+                    if (socket == null)
+                    {
+                        Debug.WriteLine("socket is null 주륵 in client");
+                    }
                     l.onSocketReceived(socket);
                 });
             }
@@ -115,6 +119,10 @@ namespace Buffalo.WiFiDirect
                 parentUI.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async() =>
                 {
                     socket = await PeerFinder.ConnectAsync((PeerInformation)device.WFDDeviceInfo);
+                    if (socket == null)
+                    {
+                        Debug.WriteLine("socket is null 주륵 in invoker");
+                    }
                     l.onSocketConnected(socket);
                 });
 

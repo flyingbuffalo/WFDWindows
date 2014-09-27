@@ -40,7 +40,9 @@ namespace Buffalo.WiFiDirect
         private event EventHandler<ConnectionRequestedEventArgs> ConnectionRequested;
         public WFDManager(DependencyObject parent,
                           WFDDeviceDiscoveredListener wfdDeviceDiscoveredListener,
-                          WFDDeviceConnectedListener wfdDeviceConnectedListener)
+                          WFDDeviceConnectedListener wfdDeviceConnectedListener,
+                          WFDPairInfo.PairSocketConnectedListener wfdPairSocketConnectedListener
+            )
         {
             this.parent = parent;
             setWFDDeviceConnectedListener(wfdDeviceConnectedListener);
@@ -55,7 +57,7 @@ namespace Buffalo.WiFiDirect
            
             PeerFinder.ConnectionRequested += async (object sender, ConnectionRequestedEventArgs args) =>
             {
-                Debug.WriteLine("ConnectionReceived");
+                Debug.WriteLine("ConnectionReceived in manager");
 
                 //StreamSocket s = await PeerFinder.ConnectAsync(args.PeerInformation);
                 if (ConnectionRequested != null)
@@ -64,7 +66,7 @@ namespace Buffalo.WiFiDirect
                 }
 
                 WFDPairInfo pInfo = new WFDPairInfo(new WFDDevice(args.PeerInformation), parent);
-                pInfo.connectSocketAsync(wfdPairSocketConnectedListener);
+                pInfo.receivedSocketAsync(wfdPairSocketConnectedListener);
                 
 
                 /*await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
