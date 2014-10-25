@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading;
 using Windows.UI.Xaml;
 using Windows.Networking;
 using Windows.Networking.Sockets;
@@ -86,6 +87,9 @@ namespace Buffalo.WiFiDirect
             if(device.IsDevice) {
             /*to Android*/
                 StreamSocketListener socketListener = new StreamSocketListener();
+                CancellationTokenSource cts = new CancellationTokenSource();
+                cts.CancelAfter(10000);
+
                 socketListener.ConnectionReceived += async (StreamSocketListener sender,
                         StreamSocketListenerConnectionReceivedEventArgs args) =>
                     {
