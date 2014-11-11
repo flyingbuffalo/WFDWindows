@@ -67,12 +67,7 @@ namespace Buffalo.WiFiDirect
 
                 WFDPairInfo pInfo = new WFDPairInfo(new WFDDevice(args.PeerInformation), parent);
                 pInfo.receivedSocketAsync(wfdPairSocketConnectedListener);
-                
-
-                /*await parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    Debug.WriteLine("Call onSocketConnected");
-                });*/
+               
             };
         }
 
@@ -155,6 +150,7 @@ namespace Buffalo.WiFiDirect
             {
                 if (device.IsDevice)
                 { /*to Android*/
+                    PeerFinder.Stop();
                     DeviceInformation devInfo = (DeviceInformation)device.WFDDeviceInfo;
 
 
@@ -168,7 +164,7 @@ namespace Buffalo.WiFiDirect
                         Debug.WriteLine(e.Message + "\n" + e.StackTrace);
                         parent.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                         {
-                            wfdDeviceConnectedListener.onDeviceConnectFailed(10);   // <- make reason code!!!
+                           wfdDeviceConnectedListener.onDeviceConnectFailed(10);   // <- make reason code!!!
                         });
                         return;
                     }
@@ -192,9 +188,6 @@ namespace Buffalo.WiFiDirect
                 { /* to Windows
                    * 실제 Connection은 WFDDeviceConnectedListener에서 이루어지므로 필요한 정보(WFDPairInfo)만 리스터로 넘겨준다.
                    */
-                    //PeerInformation peerInfo = (PeerInformation)device.WFDDeviceInfo;
-                    //StreamSocket socket = await PeerFinder.ConnectAsync(peerInfo);
-
                     wfdDeviceConnectedListener.onDeviceConnected(new WFDPairInfo(device, parent));
                 }
             });
