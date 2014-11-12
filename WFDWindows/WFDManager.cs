@@ -201,9 +201,9 @@ namespace Buffalo.WiFiDirect
             }
             else
             {
-                //PeerFinder.Stop();
-                //add peerfinder
+                PeerFinder.Stop();                                                             
             }
+            PeerFinder.Start();    
         }
     }
 }
